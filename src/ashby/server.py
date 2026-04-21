@@ -1286,11 +1286,15 @@ async def run_http(host: str, port: int) -> None:
 
 
 async def run() -> None:
-    """Dispatch to stdio (default) or http transport based on MCP_TRANSPORT."""
+    """Dispatch to stdio (default) or http transport based on MCP_TRANSPORT.
+
+    Port selection for HTTP mode tries MCP_PORT first, then PORT (the
+    convention used by Render, Heroku, Fly, Railway, etc.), then 8000.
+    """
     transport = os.getenv("MCP_TRANSPORT", "stdio").lower()
     if transport == "http":
         host = os.getenv("MCP_HOST", "127.0.0.1")
-        port = int(os.getenv("MCP_PORT", "8000"))
+        port = int(os.getenv("MCP_PORT") or os.getenv("PORT") or "8000")
         await run_http(host, port)
     else:
         await run_stdio()
