@@ -2,17 +2,18 @@
 
 > Forked from [thnico/MCP-Ashby](https://github.com/thz/MCP-Ashby) — thanks to Nicolas Thouzeau for the original implementation.
 
-A Model Context Protocol (MCP) server that exposes Ashby ATS operations to Claude. Point Claude Code (or any MCP-compatible client) at this server and you can manage candidates, jobs, applications, interviews, projects, and custom fields in natural language.
+A Model Context Protocol (MCP) server that exposes Ashby ATS operations to Claude. Point Claude Code (or any MCP-compatible client) at this server and you can manage candidates, jobs, applications, interviews, projects, sources, and custom fields in natural language.
 
 ## What's included
 
-42 tools across six areas:
+44 tools across seven areas:
 
-- **Candidates** — create, search, list, get, update, notes, tags, projects, client info, anonymize, resume + file upload
+- **Candidates** — create, search, list, list all (auto-paginated), get, update, notes, tags, projects, client info, anonymize, resume + file upload
 - **Jobs** — create, search, list, get, update, set status (Open/Closed/Archived/Draft)
 - **Applications** — create, list, get, update, change stage, change source, transfer, add/remove hiring team members
 - **Interviews** — list interview-type definitions, schedule interview events, list/update/cancel schedules
 - **Projects** — get, list, search (useful for attaching candidates)
+- **Sources** — list (discover sourceIds for `create_candidate` and `change_application_source`)
 - **Custom fields** — list (with client-side objectType filter), get, create, setValue (polymorphic by field type)
 
 ## Team setup (2 commands)
