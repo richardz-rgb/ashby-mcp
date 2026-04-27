@@ -86,6 +86,10 @@ _SIMPLE: dict[str, tuple[str, str]] = {
     "get_interview_stage":        ("/interviewStage.info",        "Interview stage"),
     "list_interview_stage_groups": ("/interviewStageGroup.list",  "Interview stage groups"),
     "list_application_feedback":  ("/applicationFeedback.list",   "Application feedback"),
+    # Local additions: department lookup + file URL retrieval (needed for the
+    # New Joiners slide automation — to map departmentId→name and fetch resume URLs).
+    "list_departments":           ("/department.list",            "Departments"),
+    "get_file_info":              ("/file.info",                  "File"),
 }
 
 
@@ -149,6 +153,11 @@ _LIST_FORMATS: dict[str, tuple[str, Sequence[Column]]] = {
         ("type", "sourceType.title"),
         ("archived", "isArchived"),
     ]),
+    "list_departments": ("Departments", [
+        ("id", "id"),
+        ("name", "name"),
+        ("archived", "isArchived"),
+    ]),
     "list_candidate_tags": ("Candidate tags", [
         ("id", "id"),
         ("title", "title"),
@@ -208,6 +217,9 @@ _RECORD_FORMATS: dict[str, tuple[Any, Sequence[Column]]] = {
     "get_candidate": ("name", [
         ("email",       "primaryEmailAddress.value"),
         ("phone",       "primaryPhoneNumber.value"),
+        ("position",    "position"),
+        ("company",     "company"),
+        ("school",      "school"),
         ("source",      "source.title"),
         ("credited to", "creditedToUser.email"),
         ("location",    lambda r: ", ".join(
@@ -217,9 +229,27 @@ _RECORD_FORMATS: dict[str, tuple[Any, Sequence[Column]]] = {
                 (r.get("location") or {}).get("country"),
             ] if v
         ) or "—"),
-        ("linkedin",    "linkedInUrl"),
+        ("linkedin",    lambda r: next(
+            (s.get("url") for s in (r.get("socialLinks") or []) if s.get("type") == "LinkedIn"),
+            "—"
+        )),
+        ("social links", lambda r: ", ".join(
+            f"{s.get('type')}: {s.get('url')}" for s in (r.get("socialLinks") or [])
+        ) or "—"),
+        ("applications", lambda r: ", ".join(r.get("applicationIds") or []) or "—"),
+        ("resume",      lambda r: (r.get("resumeFileHandle") or {}).get("name") or "—"),
+        ("resume handle", lambda r: (r.get("resumeFileHandle") or {}).get("handle") or "—"),
+        ("file handles", lambda r: "; ".join(
+            f"{f.get('name')}={f.get('handle')}" for f in (r.get("fileHandles") or [])
+        ) or "—"),
+        ("custom fields", lambda r: "; ".join(
+            f"{cf.get('title')}={cf.get('value')}" for cf in (r.get("customFields") or [])
+            if cf.get("value") not in (None, "")
+        ) or "—"),
+        ("profile url", "profileUrl"),
         ("tags",        "tags"),
         ("created",     "createdAt"),
+        ("updated",     "updatedAt"),
     ]),
     "get_job": ("title", [
         ("status",     "status"),
@@ -250,6 +280,11 @@ _RECORD_FORMATS: dict[str, tuple[Any, Sequence[Column]]] = {
     "get_interview": ("title", [
         ("type",     "type"),
         ("duration", "duration"),
+    ]),
+    "get_file_info": (lambda r: r.get("name") or r.get("id") or "file", [
+        ("download url", "url"),
+        ("expires at",   "expiresAt"),
+        ("size",         "size"),
     ]),
 }
 

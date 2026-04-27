@@ -815,6 +815,27 @@ def all_tools() -> list[types.Tool]:
             }
         ),
         types.Tool(
+            name="list_departments",
+            description="List all departments in the workspace (id, name, archived). Useful for mapping a job's departmentId back to a human-readable department name.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "includeArchived": {"type": "boolean", "description": "Include archived departments (default false)"}
+                }
+            }
+        ),
+        types.Tool(
+            name="get_file_info",
+            description="Resolve an Ashby file handle (from candidate.resumeFileHandle.handle or fileHandles[].handle) into a temporary signed download URL. Use this to fetch a candidate's resume PDF.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "fileHandle": {"type": "string", "description": "The opaque handle string from candidate.resumeFileHandle.handle or fileHandles[].handle"}
+                },
+                "required": ["fileHandle"]
+            }
+        ),
+        types.Tool(
             name="list_application_feedback",
             description=(
                 "List interview feedback submissions for an application. "
